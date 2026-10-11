@@ -1,0 +1,38 @@
+name: Release
+
+# Push a tag like v0.1.0 to publish to PyPI and move the floating v0 tag
+# that `uses: RoboDevelopX/breakwise@v0` points at.
+on:
+  push:
+    tags: ["v*.*.*"]
+
+jobs:
+  pypi:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # PyPI trusted publishing, no API token needed
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check the tag matches the package version
+        run: |
+          version=$(python -c "import re;print(re.search(r'__version__ = \"(.+?)\"', open('src/breakwise/__init__.py').read()).group(1))")
+          test "v${version}" = "${GITHUB_REF_NAME}" || { echo "::error::tag ${GITHUB_REF_NAME} != version ${version}"; exit 1; }
+      - run: python -m pip install build && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  floating-tag:
+    needs: pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Move the major-version tag
+        run: |
+          major="${GITHUB_REF_NAME%%.*}"
+          git tag -f "${major}" "${GITHUB_SHA}"
+          git push -f origin "refs/tags/${major}"

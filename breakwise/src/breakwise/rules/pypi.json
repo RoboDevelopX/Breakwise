@@ -1,0 +1,703 @@
+[
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.dict"
+  ],
+  "text": "`BaseModel.dict()` is deprecated in Pydantic V2 and renamed to `model_dump()`.",
+  "fix": "Replace `.dict(...)` with `.model_dump(...)`; the keyword arguments (`include`, `exclude`, `exclude_none`, `by_alias`, ...) are the same."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.json"
+  ],
+  "text": "`BaseModel.json()` is deprecated in Pydantic V2 and renamed to `model_dump_json()`.",
+  "fix": "Replace `.json(...)` with `.model_dump_json(...)`. Custom `encoder=`/`dumps_kwargs` are gone; use `@field_serializer` for custom encoding."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.parse_obj"
+  ],
+  "text": "`BaseModel.parse_obj()` is deprecated in Pydantic V2 and renamed to `model_validate()`.",
+  "fix": "Replace `Model.parse_obj(data)` with `Model.model_validate(data)`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.parse_raw"
+  ],
+  "text": "`BaseModel.parse_raw()` is deprecated in Pydantic V2.",
+  "fix": "Replace `Model.parse_raw(s)` with `Model.model_validate_json(s)`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.parse_file"
+  ],
+  "text": "`BaseModel.parse_file()` is deprecated in Pydantic V2.",
+  "fix": "Read the file yourself and call `Model.model_validate_json(path.read_text())`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.from_orm"
+  ],
+  "text": "`BaseModel.from_orm()` is deprecated in Pydantic V2.",
+  "fix": "Set `model_config = ConfigDict(from_attributes=True)` on the model and call `Model.model_validate(obj)`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.copy"
+  ],
+  "text": "`BaseModel.copy()` is deprecated in Pydantic V2 and renamed to `model_copy()`.",
+  "fix": "Replace `.copy(update=...)` with `.model_copy(update=...)`. `include`/`exclude` are gone; use `model_dump()` and rebuild if you need them."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.schema",
+   "BaseModel.schema_json"
+  ],
+  "text": "`BaseModel.schema()` and `schema_json()` are deprecated in Pydantic V2.",
+  "fix": "Use `Model.model_json_schema()` (and `json.dumps(...)` it if you need a string)."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.construct"
+  ],
+  "text": "`BaseModel.construct()` is deprecated in Pydantic V2 and renamed to `model_construct()`.",
+  "fix": "Replace `Model.construct(...)` with `Model.model_construct(...)`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.update_forward_refs"
+  ],
+  "text": "`BaseModel.update_forward_refs()` is deprecated in Pydantic V2.",
+  "fix": "Replace `Model.update_forward_refs()` with `Model.model_rebuild()`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.__fields__"
+  ],
+  "text": "`__fields__` is deprecated in Pydantic V2.",
+  "fix": "Use `Model.model_fields` (a dict of `FieldInfo`)."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "pydantic.validator"
+  ],
+  "text": "`@validator` is deprecated in Pydantic V2 in favor of `@field_validator`.",
+  "fix": "Use `@field_validator(\"field\")` stacked on `@classmethod`. `pre=True` becomes `mode=\"before\"`, `each_item=True` has no direct equivalent (validate the item type instead), and `always=True` becomes `Field(validate_default=True)`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "pydantic.root_validator"
+  ],
+  "text": "`@root_validator` is deprecated in Pydantic V2 in favor of `@model_validator`.",
+  "fix": "Use `@model_validator(mode=\"before\")` (a classmethod receiving the raw data) or `@model_validator(mode=\"after\")` (an instance method receiving the model)."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.Config"
+  ],
+  "text": "The inner `class Config` is deprecated in Pydantic V2.",
+  "fix": "Replace `class Config:` with `model_config = ConfigDict(...)` (import `ConfigDict` from `pydantic`)."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.Config.orm_mode"
+  ],
+  "text": "The `orm_mode` config key was renamed to `from_attributes` in Pydantic V2.",
+  "fix": "Use `model_config = ConfigDict(from_attributes=True)`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.Config.allow_population_by_field_name"
+  ],
+  "text": "`allow_population_by_field_name` was renamed to `populate_by_name` in Pydantic V2.",
+  "fix": "Use `model_config = ConfigDict(populate_by_name=True)`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.Config.allow_mutation"
+  ],
+  "text": "`allow_mutation` was replaced by `frozen` in Pydantic V2.",
+  "fix": "Use `model_config = ConfigDict(frozen=True)` instead of `allow_mutation = False`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "BaseModel.Config.schema_extra"
+  ],
+  "text": "`schema_extra` was renamed to `json_schema_extra` in Pydantic V2.",
+  "fix": "Use `model_config = ConfigDict(json_schema_extra=...)`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "breaking",
+  "symbols": [
+   "pydantic.BaseSettings"
+  ],
+  "text": "`BaseSettings` moved out of Pydantic V2 into the separate `pydantic-settings` package; importing it from `pydantic` raises an error.",
+  "fix": "`pip install pydantic-settings` and change the import to `from pydantic_settings import BaseSettings`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "breaking",
+  "symbols": [
+   "BaseModel.__root__"
+  ],
+  "text": "Custom root types with `__root__` are not supported in Pydantic V2.",
+  "fix": "Subclass `RootModel[YourType]` and read the value from `.root`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "breaking",
+  "symbols": [
+   "pydantic.Field.regex",
+   "pydantic.constr.regex"
+  ],
+  "text": "The `regex` argument was removed in Pydantic V2 and raises an error.",
+  "fix": "Rename `regex=` to `pattern=`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "breaking",
+  "symbols": [
+   "pydantic.Field.const"
+  ],
+  "text": "The `const` argument to `Field` was removed in Pydantic V2.",
+  "fix": "Annotate the field with `Literal[value]` instead."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "pydantic.Field.min_items",
+   "pydantic.Field.max_items",
+   "pydantic.conlist.min_items",
+   "pydantic.conlist.max_items"
+  ],
+  "text": "`min_items`/`max_items` are deprecated in Pydantic V2.",
+  "fix": "Use `min_length=` / `max_length=`."
+ },
+ {
+  "package": "pydantic",
+  "version": "2.0",
+  "kind": "deprecation",
+  "symbols": [
+   "pydantic.parse_obj_as"
+  ],
+  "text": "`parse_obj_as` is deprecated in Pydantic V2.",
+  "fix": "Use `TypeAdapter(SomeType).validate_python(data)`."
+ },
+ {
+  "package": "sqlalchemy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "create_engine.execute",
+   "Engine.execute"
+  ],
+  "text": "`Engine.execute()` (implicit, connectionless execution) was removed in SQLAlchemy 2.0.",
+  "fix": "Open a connection explicitly: `with engine.connect() as conn: conn.execute(text(\"...\"))` (and `conn.commit()` for writes), or use `engine.begin()` for a transaction."
+ },
+ {
+  "package": "sqlalchemy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "sqlalchemy.MetaData.bind",
+   "MetaData.bind"
+  ],
+  "text": "Bound metadata (`MetaData(bind=...)`) was removed in SQLAlchemy 2.0.",
+  "fix": "Drop `bind=` and pass the engine or connection where you execute, e.g. `metadata.create_all(engine)`."
+ },
+ {
+  "package": "sqlalchemy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "sessionmaker.autocommit",
+   "Session.autocommit"
+  ],
+  "text": "The `autocommit` mode for `Session` was removed in SQLAlchemy 2.0.",
+  "fix": "Remove `autocommit=True` and call `session.commit()` (or use `with session.begin():`)."
+ },
+ {
+  "package": "sqlalchemy",
+  "version": "2.0.0",
+  "kind": "deprecation",
+  "symbols": [
+   "sqlalchemy.ext.declarative.declarative_base"
+  ],
+  "text": "`sqlalchemy.ext.declarative.declarative_base` moved in SQLAlchemy 2.0.",
+  "fix": "Import it from `sqlalchemy.orm` (`from sqlalchemy.orm import declarative_base`), or switch to `class Base(DeclarativeBase): pass`."
+ },
+ {
+  "package": "sqlalchemy",
+  "version": "2.0.0",
+  "kind": "deprecation",
+  "symbols": [
+   "query.get"
+  ],
+  "text": "`Query.get()` is a legacy API in SQLAlchemy 2.0.",
+  "fix": "Use `session.get(Model, primary_key)`."
+ },
+ {
+  "package": "flask",
+  "version": "2.3.0",
+  "kind": "breaking",
+  "symbols": [
+   "Flask.before_first_request"
+  ],
+  "text": "`before_first_request` was removed in Flask 2.3.",
+  "fix": "Run that setup code once when you create the app, inside `with app.app_context():`."
+ },
+ {
+  "package": "flask",
+  "version": "2.3.0",
+  "kind": "breaking",
+  "symbols": [
+   "flask.json.JSONEncoder",
+   "flask.json.JSONDecoder",
+   "Flask.json_encoder",
+   "Flask.json_decoder"
+  ],
+  "text": "Custom `JSONEncoder`/`JSONDecoder` classes and `app.json_encoder` were removed in Flask 2.3.",
+  "fix": "Subclass `flask.json.provider.DefaultJSONProvider` and set `app.json = MyProvider(app)`."
+ },
+ {
+  "package": "flask",
+  "version": "2.3.0",
+  "kind": "breaking",
+  "symbols": [
+   "JSON_AS_ASCII",
+   "JSON_SORT_KEYS",
+   "JSONIFY_PRETTYPRINT_REGULAR",
+   "JSONIFY_MIMETYPE"
+  ],
+  "text": "The `JSON_*` and `JSONIFY_*` config keys were removed in Flask 2.3.",
+  "fix": "Set the equivalent attributes on the provider instead, e.g. `app.json.ensure_ascii = False`, `app.json.sort_keys = False`."
+ },
+ {
+  "package": "flask",
+  "version": "2.2.0",
+  "kind": "breaking",
+  "symbols": [
+   "send_file.attachment_filename",
+   "send_file.cache_timeout",
+   "send_from_directory.attachment_filename",
+   "send_from_directory.cache_timeout"
+  ],
+  "text": "The old `send_file` argument names were removed in Flask 2.2.",
+  "fix": "Rename `attachment_filename=` to `download_name=` and `cache_timeout=` to `max_age=`."
+ },
+ {
+  "package": "flask",
+  "version": "3.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "flask.Markup",
+   "flask.escape"
+  ],
+  "text": "`flask.Markup` and `flask.escape` were removed in Flask 3.0.",
+  "fix": "Import them from MarkupSafe instead: `from markupsafe import Markup, escape`."
+ },
+ {
+  "package": "flask",
+  "version": "3.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "flask._app_ctx_stack",
+   "flask._request_ctx_stack"
+  ],
+  "text": "`_app_ctx_stack` and `_request_ctx_stack` were removed in Flask 3.0.",
+  "fix": "Store data on `flask.g`, or use `flask.globals.app_ctx` / `flask.globals.request_ctx` if you really need the context object."
+ },
+ {
+  "package": "werkzeug",
+  "version": "3.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "werkzeug.urls.url_quote",
+   "werkzeug.urls.url_unquote",
+   "werkzeug.urls.url_encode",
+   "werkzeug.urls.url_decode",
+   "werkzeug.urls.url_parse",
+   "werkzeug.urls.url_join",
+   "werkzeug.urls.url_quote_plus"
+  ],
+  "text": "Most functions in `werkzeug.urls` were removed in Werkzeug 3.0.",
+  "fix": "Use the standard library: `urllib.parse.quote`, `unquote`, `urlencode`, `parse_qs`, `urlsplit`, `urljoin`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.float_"
+  ],
+  "text": "`np.float_` was removed in NumPy 2.0.",
+  "fix": "Use `np.float64`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.complex_"
+  ],
+  "text": "`np.complex_` was removed in NumPy 2.0.",
+  "fix": "Use `np.complex128`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.NaN",
+   "numpy.NAN"
+  ],
+  "text": "`np.NaN` was removed in NumPy 2.0.",
+  "fix": "Use `np.nan`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.Inf",
+   "numpy.Infinity",
+   "numpy.infty",
+   "numpy.PINF"
+  ],
+  "text": "The aliases `np.Inf`, `np.Infinity`, `np.infty` and `np.PINF` were removed in NumPy 2.0.",
+  "fix": "Use `np.inf`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.NINF"
+  ],
+  "text": "`np.NINF` was removed in NumPy 2.0.",
+  "fix": "Use `-np.inf`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.unicode_",
+   "numpy.string_"
+  ],
+  "text": "`np.unicode_` and `np.string_` were removed in NumPy 2.0.",
+  "fix": "Use `np.str_` and `np.bytes_`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.alltrue",
+   "numpy.sometrue"
+  ],
+  "text": "`np.alltrue` and `np.sometrue` were removed in NumPy 2.0.",
+  "fix": "Use `np.all` and `np.any`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.product",
+   "numpy.cumproduct"
+  ],
+  "text": "`np.product` and `np.cumproduct` were removed in NumPy 2.0.",
+  "fix": "Use `np.prod` and `np.cumprod`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.round_"
+  ],
+  "text": "`np.round_` was removed in NumPy 2.0.",
+  "fix": "Use `np.round`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.cast"
+  ],
+  "text": "`np.cast` was removed in NumPy 2.0.",
+  "fix": "Use `np.asarray(arr, dtype=dtype)`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.find_common_type"
+  ],
+  "text": "`np.find_common_type` was removed in NumPy 2.0.",
+  "fix": "Use `np.result_type` or `np.promote_types`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "numpy.asfarray"
+  ],
+  "text": "`np.asfarray` was removed in NumPy 2.0.",
+  "fix": "Use `np.asarray(x, dtype=float)`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "deprecation",
+  "symbols": [
+   "numpy.in1d"
+  ],
+  "text": "`np.in1d` is deprecated in NumPy 2.0.",
+  "fix": "Use `np.isin`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "deprecation",
+  "symbols": [
+   "numpy.trapz"
+  ],
+  "text": "`np.trapz` is deprecated in NumPy 2.0.",
+  "fix": "Use `np.trapezoid`."
+ },
+ {
+  "package": "numpy",
+  "version": "2.0.0",
+  "kind": "deprecation",
+  "symbols": [
+   "numpy.row_stack"
+  ],
+  "text": "`np.row_stack` is deprecated in NumPy 2.0.",
+  "fix": "Use `np.vstack`."
+ },
+ {
+  "package": "pandas",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "DataFrame.append",
+   "Series.append",
+   "read_csv.append",
+   "read_excel.append",
+   "read_sql.append",
+   "read_json.append",
+   "read_parquet.append"
+  ],
+  "text": "`DataFrame.append` and `Series.append` were removed in pandas 2.0.",
+  "fix": "Use `pd.concat([df, other], ignore_index=True)`; to add one row, wrap it first: `pd.concat([df, pd.DataFrame([row])], ignore_index=True)`."
+ },
+ {
+  "package": "pandas",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "iteritems"
+  ],
+  "text": "`iteritems()` was removed from DataFrame and Series in pandas 2.0.",
+  "fix": "Use `.items()`."
+ },
+ {
+  "package": "pandas",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "pandas.datetime"
+  ],
+  "text": "`pd.datetime` was removed in pandas 2.0.",
+  "fix": "Use the standard library: `import datetime` / `from datetime import datetime`."
+ },
+ {
+  "package": "pandas",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "pandas.Int64Index",
+   "pandas.UInt64Index",
+   "pandas.Float64Index"
+  ],
+  "text": "`Int64Index`, `UInt64Index` and `Float64Index` were removed in pandas 2.0.",
+  "fix": "Use `pd.Index(values, dtype=\"int64\")` (or the matching dtype)."
+ },
+ {
+  "package": "pandas",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "read_csv.squeeze",
+   "read_csv.mangle_dupe_cols",
+   "read_csv.error_bad_lines",
+   "read_csv.warn_bad_lines"
+  ],
+  "text": "Several `read_csv` arguments were removed in pandas 2.0: `squeeze`, `mangle_dupe_cols`, `error_bad_lines`, `warn_bad_lines`.",
+  "fix": "Replace `error_bad_lines=False`/`warn_bad_lines` with `on_bad_lines=\"skip\"` or `\"warn\"`, and `squeeze=True` with `.squeeze(\"columns\")` on the result; drop `mangle_dupe_cols`."
+ },
+ {
+  "package": "pandas",
+  "version": "2.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "to_csv.line_terminator"
+  ],
+  "text": "`to_csv(line_terminator=...)` was removed in pandas 2.0.",
+  "fix": "Rename it to `lineterminator=`."
+ },
+ {
+  "package": "pandas",
+  "version": "2.1.0",
+  "kind": "deprecation",
+  "symbols": [
+   "applymap"
+  ],
+  "text": "`DataFrame.applymap` is deprecated in pandas 2.1.",
+  "fix": "Use `DataFrame.map`, which takes the same function."
+ },
+ {
+  "package": "pandas",
+  "version": "2.1.0",
+  "kind": "deprecation",
+  "symbols": [
+   "fillna.method"
+  ],
+  "text": "`fillna(method=...)` is deprecated in pandas 2.1.",
+  "fix": "Use `.ffill()` or `.bfill()`."
+ },
+ {
+  "package": "django",
+  "version": "4.0",
+  "kind": "breaking",
+  "symbols": [
+   "django.utils.translation.ugettext",
+   "django.utils.translation.ugettext_lazy",
+   "django.utils.translation.ugettext_noop",
+   "django.utils.translation.ungettext",
+   "django.utils.translation.ungettext_lazy"
+  ],
+  "text": "The `ugettext*` / `ungettext*` aliases were removed in Django 4.0.",
+  "fix": "Use `gettext`, `gettext_lazy`, `gettext_noop`, `ngettext` and `ngettext_lazy`."
+ },
+ {
+  "package": "django",
+  "version": "4.0",
+  "kind": "breaking",
+  "symbols": [
+   "django.conf.urls.url"
+  ],
+  "text": "`django.conf.urls.url()` was removed in Django 4.0.",
+  "fix": "Use `django.urls.re_path()` (same arguments), or `path()` for non-regex routes."
+ },
+ {
+  "package": "django",
+  "version": "4.0",
+  "kind": "breaking",
+  "symbols": [
+   "django.utils.encoding.force_text",
+   "django.utils.encoding.smart_text"
+  ],
+  "text": "`force_text()` and `smart_text()` were removed in Django 4.0.",
+  "fix": "Use `force_str()` and `smart_str()`."
+ },
+ {
+  "package": "django",
+  "version": "4.0",
+  "kind": "breaking",
+  "symbols": [
+   "django.utils.http.urlquote",
+   "django.utils.http.urlquote_plus",
+   "django.utils.http.urlunquote",
+   "django.utils.http.urlunquote_plus"
+  ],
+  "text": "The `urlquote` family in `django.utils.http` was removed in Django 4.0.",
+  "fix": "Use `urllib.parse.quote`, `quote_plus`, `unquote` and `unquote_plus`."
+ },
+ {
+  "package": "django",
+  "version": "5.0",
+  "kind": "breaking",
+  "symbols": [
+   "django.utils.timezone.utc"
+  ],
+  "text": "`django.utils.timezone.utc` was removed in Django 5.0.",
+  "fix": "Use `datetime.timezone.utc`."
+ },
+ {
+  "package": "django",
+  "version": "5.0",
+  "kind": "breaking",
+  "symbols": [
+   "django.contrib.auth.views.LogoutView"
+  ],
+  "text": "Logging out with a GET request to `LogoutView` was removed in Django 5.0.",
+  "fix": "Log out with a POST form (include `{% csrf_token %}`) instead of a link."
+ }
+]

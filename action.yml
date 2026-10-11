@@ -1,0 +1,118 @@
+name: Breakwise
+description: Comment on pull requests with the dependency updates that actually affect your code, what breaks, and the exact fix.
+author: RoboDevelopX
+branding:
+  icon: alert-triangle
+  color: orange
+
+inputs:
+  github-token:
+    description: Token used to post the PR comment. Needs `pull-requests: write`.
+    default: ${{ github.token }}
+  anthropic-api-key:
+    description: Optional. With a Claude API key, Breakwise drops false positives, catches changes the static matcher missed, and writes a concrete fix for each one.
+    default: ""
+  model:
+    description: Claude model to use when an API key is set.
+    default: ""
+  path:
+    description: Project directory to scan, relative to the repository root.
+    default: "."
+  mode:
+    description: "`auto` (default): on pull requests, explain the dependency versions the PR changes; elsewhere, compare every dependency with its latest release. Or force `pr` / `scan`."
+    default: auto
+  fail-on:
+    description: "`never` (default), `breaking` (fail when an update breaks your code) or `matters` (fail when any update affects your code)."
+    default: never
+  comment:
+    description: Post the report as a PR comment (updated in place on every push).
+    default: "true"
+  python-version:
+    description: Python used to run Breakwise (not your project).
+    default: "3.12"
+
+outputs:
+  checked:
+    description: Number of dependencies checked.
+    value: ${{ steps.run.outputs.checked }}
+  updated:
+    description: Number of dependencies with a version change.
+    value: ${{ steps.run.outputs.updated }}
+  matters:
+    description: Number of updates that affect your code.
+    value: ${{ steps.run.outputs.matters }}
+  breaking:
+    description: Number of updates with a breaking change in your code.
+    value: ${{ steps.run.outputs.breaking }}
+  report:
+    description: Path of the Markdown report.
+    value: ${{ steps.run.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install Breakwise
+      shell: bash
+      run: python -m pip install --quiet --disable-pip-version-check "${GITHUB_ACTION_PATH}[ai]"
+
+    - name: Run Breakwise
+      id: run
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        BREAKWISE_MODEL: ${{ inputs.model }}
+        BREAKWISE_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        MODE: ${{ inputs.mode }}
+      run: |
+        report="${RUNNER_TEMP}/breakwise-report.md"
+        echo "report=${report}" >> "$GITHUB_OUTPUT"
+        ai=""
+        if [ -n "${ANTHROPIC_API_KEY}" ]; then ai="--ai"; fi
+        if [ "${MODE}" = "auto" ]; then
+          if [ -n "${BASE_SHA}" ]; then MODE=pr; else MODE=scan; fi
+        fi
+        if [ "${MODE}" = "pr" ]; then
+          if [ -z "${BASE_SHA}" ]; then echo "::error::mode: pr needs a pull_request event"; exit 2; fi
+          # actions/checkout fetches one commit by default; make sure the base is available.
+          git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 origin "${BASE_SHA}"
+          breakwise pr --base "${BASE_SHA}" . ${ai} -q --format markdown -o "${report}" \
+            --json-output "${RUNNER_TEMP}/breakwise-report.json" --github-output
+        else
+          breakwise scan . ${ai} -q --format markdown -o "${report}" \
+            --json-output "${RUNNER_TEMP}/breakwise-report.json" --github-output
+        fi
+        cat "${report}" >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Comment on the pull request
+      if: inputs.comment == 'true' && github.event.pull_request.number
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        UPDATED: ${{ steps.run.outputs.updated }}
+        REPORT: ${{ steps.run.outputs.report }}
+      run: |
+        # Stay quiet on PRs that don't touch dependencies, unless an earlier push left a comment to update.
+        if [ "${UPDATED:-0}" = "0" ] && ! breakwise comment --exists 2>/dev/null; then
+          echo "No dependency changes in this PR; not commenting."
+          exit 0
+        fi
+        breakwise comment "${REPORT}" || echo "::warning::Breakwise couldn't comment (fork PRs get a read-only token). The report is in the job summary."
+
+    - name: Check result
+      shell: bash
+      env:
+        FAIL_ON: ${{ inputs.fail-on }}
+        MATTERS: ${{ steps.run.outputs.matters }}
+        BREAKING: ${{ steps.run.outputs.breaking }}
+        HEADLINE: ${{ steps.run.outputs.headline }}
+      run: |
+        echo "Breakwise: ${HEADLINE}"
+        if [ "${FAIL_ON}" = "breaking" ] && [ "${BREAKING:-0}" != "0" ]; then echo "::error::${HEADLINE}"; exit 1; fi
+        if [ "${FAIL_ON}" = "matters" ] && [ "${MATTERS:-0}" != "0" ]; then echo "::error::${HEADLINE}"; exit 1; fi

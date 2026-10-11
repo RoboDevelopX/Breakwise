@@ -1,0 +1,160 @@
+[
+ {
+  "package": "express",
+  "version": "5.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "app.del"
+  ],
+  "text": "`app.del()` was removed in Express 5.",
+  "fix": "Use `app.delete()`."
+ },
+ {
+  "package": "express",
+  "version": "5.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "req.param"
+  ],
+  "text": "`req.param(name)` was removed in Express 5.",
+  "fix": "Read the value from `req.params`, `req.body` or `req.query` explicitly."
+ },
+ {
+  "package": "express",
+  "version": "5.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "res.sendfile"
+  ],
+  "text": "`res.sendfile()` was removed in Express 5.",
+  "fix": "Use `res.sendFile()` (note the capital F; paths must be absolute or use the `root` option)."
+ },
+ {
+  "package": "express",
+  "version": "5.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "req.acceptsCharset",
+   "req.acceptsEncoding",
+   "req.acceptsLanguage"
+  ],
+  "text": "The singular `req.acceptsCharset/Encoding/Language` methods were removed in Express 5.",
+  "fix": "Use the plural forms: `req.acceptsCharsets()`, `req.acceptsEncodings()`, `req.acceptsLanguages()`."
+ },
+ {
+  "package": "express",
+  "version": "5.0.0",
+  "kind": "other",
+  "symbols": [
+   "express.urlencoded"
+  ],
+  "text": "`express.urlencoded()` defaults to `extended: false` in Express 5.",
+  "fix": "Pass `{ extended: true }` explicitly if you rely on nested objects in form bodies."
+ },
+ {
+  "package": "express",
+  "version": "5.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "express.static.mime",
+   "express.static.mime"
+  ],
+  "text": "`express.static.mime` was removed in Express 5.",
+  "fix": "Use the `mime-types` package directly."
+ },
+ {
+  "package": "react-dom",
+  "version": "18.0.0",
+  "kind": "deprecation",
+  "symbols": [
+   "react-dom.render"
+  ],
+  "text": "`ReactDOM.render` is deprecated in React 18 and runs your app in React 17 mode.",
+  "fix": "Use `createRoot` from `react-dom/client`: `createRoot(container).render(<App />)`."
+ },
+ {
+  "package": "react-dom",
+  "version": "18.0.0",
+  "kind": "deprecation",
+  "symbols": [
+   "react-dom.hydrate"
+  ],
+  "text": "`ReactDOM.hydrate` is deprecated in React 18.",
+  "fix": "Use `hydrateRoot(container, <App />)` from `react-dom/client`."
+ },
+ {
+  "package": "react-dom",
+  "version": "18.0.0",
+  "kind": "deprecation",
+  "symbols": [
+   "react-dom.unmountComponentAtNode"
+  ],
+  "text": "`unmountComponentAtNode` is deprecated in React 18.",
+  "fix": "Keep the root from `createRoot` and call `root.unmount()`."
+ },
+ {
+  "package": "react-dom",
+  "version": "19.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "react-dom.render",
+   "react-dom.hydrate",
+   "react-dom.unmountComponentAtNode",
+   "react-dom.findDOMNode"
+  ],
+  "text": "`ReactDOM.render`, `hydrate`, `unmountComponentAtNode` and `findDOMNode` were removed in React 19.",
+  "fix": "Use `createRoot` / `hydrateRoot` from `react-dom/client` and `root.unmount()`; replace `findDOMNode` with a ref."
+ },
+ {
+  "package": "react-dom",
+  "version": "19.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "react-dom/test-utils.act"
+  ],
+  "text": "`act` moved out of `react-dom/test-utils` in React 19.",
+  "fix": "Import it from `react`: `import { act } from 'react'`."
+ },
+ {
+  "package": "react",
+  "version": "19.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "react.createFactory"
+  ],
+  "text": "`React.createFactory` was removed in React 19.",
+  "fix": "Use JSX or `React.createElement` directly."
+ },
+ {
+  "package": "react",
+  "version": "19.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "defaultProps"
+  ],
+  "text": "`defaultProps` is ignored for function components in React 19.",
+  "fix": "Use default values in the destructured props: `function Button({ size = 'md' })`."
+ },
+ {
+  "package": "react",
+  "version": "19.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "propTypes"
+  ],
+  "text": "`propTypes` checks were removed in React 19 and are silently ignored.",
+  "fix": "Move to TypeScript or another type checker; delete the `propTypes` assignments."
+ },
+ {
+  "package": "next",
+  "version": "15.0.0",
+  "kind": "breaking",
+  "symbols": [
+   "next/headers.cookies",
+   "next/headers.headers",
+   "next/headers.draftMode"
+  ],
+  "text": "`cookies()`, `headers()` and `draftMode()` are async in Next.js 15.",
+  "fix": "`await` them: `const cookieStore = await cookies()`. Run `npx @next/codemod@canary next-async-request-api .` to update call sites."
+ }
+]

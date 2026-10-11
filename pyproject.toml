@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "breakwise"
+dynamic = ["version"]
+description = "Find out which dependency updates actually affect your code, what breaks, and the exact fix."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "Ribhu" }]
+keywords = ["dependencies", "changelog", "breaking-changes", "upgrade", "requirements", "package.json", "dependabot"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = ["packaging>=23.0"]
+
+[project.optional-dependencies]
+ai = ["anthropic>=1.13"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+breakwise = "breakwise.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/RoboDevelopX/breakwise"
+Issues = "https://github.com/RoboDevelopX/breakwise/issues"
+
+[tool.hatch.version]
+path = "src/breakwise/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/breakwise"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

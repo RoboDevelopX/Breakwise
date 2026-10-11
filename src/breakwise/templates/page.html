@@ -1,0 +1,445 @@
+<title>Breakwise</title>
+<style>
+/* Layout: one reading column. Summary first, then a ledger of packages, worst first; each row opens to what changed, where your code uses it, and the fix. */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --sunken: #eef1f5;
+  --fg: #17212c;
+  --muted: #5a6776;
+  --line: #dae0e7;
+  --accent: #1d5c8c;
+  --accent-ink: #ffffff;
+  --breaking: #b02f28;
+  --breaking-bg: #fbeceb;
+  --security: #8a389f;
+  --security-bg: #f5ebf8;
+  --warning: #8f5c00;
+  --warning-bg: #fbf1dc;
+  --ok: #2a6f45;
+  --ok-bg: #e6f3ea;
+  --unknown: #5a6776;
+  --unknown-bg: #edf0f4;
+  --fix-bg: #eaf4ee;
+  --code-bg: #f0f3f7;
+  --font-ui: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1318; --surface: #151c23; --sunken: #1a222b; --fg: #e3e8ee; --muted: #96a2b0; --line: #29333f;
+    --accent: #7ab4e4; --accent-ink: #0b1520;
+    --breaking: #ff7d73; --breaking-bg: #3a1b1a; --security: #d48de5; --security-bg: #2e1c35;
+    --warning: #e3b24c; --warning-bg: #33270f; --ok: #72cf92; --ok-bg: #15291d; --unknown: #96a2b0; --unknown-bg: #1f2730;
+    --fix-bg: #13261a; --code-bg: #10161c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1318; --surface: #151c23; --sunken: #1a222b; --fg: #e3e8ee; --muted: #96a2b0; --line: #29333f;
+  --accent: #7ab4e4; --accent-ink: #0b1520;
+  --breaking: #ff7d73; --breaking-bg: #3a1b1a; --security: #d48de5; --security-bg: #2e1c35;
+  --warning: #e3b24c; --warning-bg: #33270f; --ok: #72cf92; --ok-bg: #15291d; --unknown: #96a2b0; --unknown-bg: #1f2730;
+  --fix-bg: #13261a; --code-bg: #10161c;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 var(--font-ui); -webkit-text-size-adjust: 100%; }
+code, .mono { font-family: var(--font-mono); font-size: 0.92em; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+.wrap { max-width: 940px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 56px; display: grid; gap: 20px; }
+
+/* top bar */
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.wordmark { font-family: var(--font-mono); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; color: var(--fg); text-decoration: none; }
+.wordmark b { color: var(--breaking); font-weight: 700; }
+.tagline { color: var(--muted); font-size: 0.87rem; }
+
+/* form */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field > label { font-weight: 600; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.row input { flex: 1 1 260px; min-width: 0; }
+input[type="text"], textarea {
+  font: 0.95rem/1.4 var(--font-mono); color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 7px; padding: 9px 11px; width: 100%;
+}
+textarea { resize: vertical; min-height: 8rem; }
+input[type="text"]:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+button { font: inherit; cursor: pointer; border-radius: 7px; }
+button:disabled { cursor: progress; opacity: 0.6; }
+.primary { background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); padding: 9px 16px; font-weight: 600; }
+.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); padding: 7px 12px; }
+.ghost:hover, .chip:hover { border-color: var(--accent); }
+.chip { background: var(--sunken); color: var(--fg); border: 1px solid var(--line); padding: 3px 10px; font: 0.85rem var(--font-mono); }
+.demos { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.87rem; color: var(--muted); }
+.hint { margin: 0; color: var(--muted); font-size: 0.87rem; }
+.panel details > summary { cursor: pointer; color: var(--accent); width: fit-content; }
+.panel details[open] > summary { margin-bottom: 8px; }
+.panel details > .hint { margin-top: 6px; }
+.check { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.check input { margin: 0; }
+
+.progress { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 0.92rem; min-width: 0; }
+.progress #progress-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1 1 auto; }
+.spinner { width: 14px; height: 14px; flex: none; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-color: var(--accent); } }
+.error { margin: 0; padding: 10px 14px; border-radius: 8px; color: var(--breaking); background: var(--breaking-bg); }
+
+.empty { color: var(--muted); border: 1px dashed var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 6px; }
+.empty h2 { margin: 0; color: var(--fg); font-size: 1rem; }
+.empty p { margin: 0; max-width: 65ch; }
+
+#results.stale { opacity: 0.45; }
+#results { display: grid; gap: 20px; }
+
+/* summary */
+.summary { display: grid; gap: 10px; }
+.eyebrow { margin: 0; color: var(--muted); font-size: 0.87rem; overflow-wrap: anywhere; }
+.headline { margin: 0; font-size: clamp(1.45rem, 1.05rem + 1.7vw, 2.1rem); line-height: 1.2; font-weight: 650; letter-spacing: -0.015em; text-wrap: balance; }
+.counts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 0.93rem; }
+.counts b { color: var(--fg); font-variant-numeric: tabular-nums; font-weight: 650; }
+.counts [data-tone] b { color: var(--tone); }
+.notice { margin: 0; padding: 10px 14px; border-radius: 8px; background: var(--warning-bg); color: var(--fg); max-width: 75ch; }
+
+/* tones */
+[data-tone="breaking"] { --tone: var(--breaking); --tone-bg: var(--breaking-bg); }
+[data-tone="security"] { --tone: var(--security); --tone-bg: var(--security-bg); }
+[data-tone="warning"] { --tone: var(--warning); --tone-bg: var(--warning-bg); }
+[data-tone="ok"] { --tone: var(--ok); --tone-bg: var(--ok-bg); }
+[data-tone="unknown"], [data-tone="current"] { --tone: var(--unknown); --tone-bg: var(--unknown-bg); }
+
+/* package ledger */
+.pkgs { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.pkg + .pkg { border-top: 1px solid var(--line); }
+.pkg-head {
+  display: grid; grid-template-columns: 10px minmax(0, 1fr) auto 14px; grid-template-areas: "dot title pill chev" ". meta meta .";
+  gap: 2px 12px; align-items: center; padding: 13px 16px; list-style: none;
+}
+details > .pkg-head { cursor: pointer; }
+details > .pkg-head:hover { background: var(--sunken); }
+.pkg-head::-webkit-details-marker { display: none; }
+.dot { grid-area: dot; width: 10px; height: 10px; border-radius: 3px; background: var(--tone); }
+.pkg-title { grid-area: title; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; min-width: 0; }
+.pkg-name { font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
+.pkg-ver { font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pkg-ver .to { color: var(--fg); }
+.pkg-meta { grid-area: meta; color: var(--muted); font-size: 0.82rem; overflow-wrap: anywhere; }
+.pill { grid-area: pill; justify-self: end; color: var(--tone); background: var(--tone-bg); border-radius: 999px; padding: 2px 10px; font-size: 0.82rem; font-weight: 600; text-align: right; }
+.chev { grid-area: chev; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); justify-self: center; transition: transform 0.15s; }
+details[open] > .pkg-head .chev { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+@media (max-width: 560px) {
+  .pkg-head { grid-template-columns: 10px minmax(0, 1fr) 14px; grid-template-areas: "dot title chev" ". pill ." ". meta ."; }
+  .pill { justify-self: start; text-align: left; }
+}
+
+.pkg-body { padding: 4px 16px 18px 38px; display: grid; gap: 16px; min-width: 0; }
+@media (max-width: 560px) { .pkg-body { padding-left: 16px; } }
+
+.impact { display: grid; gap: 8px; min-width: 0; }
+.impact.possible { opacity: 0.85; }
+.impact-head { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; color: var(--muted); font-size: 0.88rem; }
+.kind { color: var(--tone); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.74rem; }
+.explain { margin: 0; max-width: 75ch; overflow-wrap: anywhere; }
+.explain code, .entries code, .fix-text code, .runtime code { background: var(--code-bg); padding: 0 4px; border-radius: 4px; }
+
+.sites { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; font-family: var(--font-mono); font-size: 0.84rem; }
+.site { display: grid; grid-template-columns: max-content max-content; gap: 16px; padding: 6px 12px; white-space: pre; }
+.site + .site { border-top: 1px solid var(--line); }
+.site .loc { color: var(--accent); }
+.more { margin: 0; color: var(--muted); font-size: 0.85rem; }
+
+.fix { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; background: var(--fix-bg); border-radius: 8px; padding: 10px 12px; }
+.fix-label { color: var(--ok); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.74rem; padding-top: 3px; }
+.fix-text { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
+
+.entries { margin: 0; padding-left: 18px; display: grid; gap: 6px; max-width: 80ch; }
+.entries li { overflow-wrap: anywhere; }
+.ver { font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); margin-right: 4px; }
+.runtime, .note { margin: 0; color: var(--muted); font-size: 0.92rem; overflow-wrap: anywhere; }
+.label { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.74rem; color: var(--muted); margin-right: 6px; }
+.sub > summary { cursor: pointer; color: var(--muted); font-size: 0.92rem; width: fit-content; }
+.sub[open] > summary { margin-bottom: 10px; }
+.sub > .impact + .impact { margin-top: 14px; }
+.links { margin: 0; font-size: 0.9rem; }
+
+.uptodate { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--muted); font-size: 0.88rem; align-items: baseline; }
+
+/* footer */
+.foot { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 0.85rem; }
+.foot-row { display: flex; gap: 10px 14px; flex-wrap: wrap; align-items: center; }
+.foot textarea { font-size: 0.8rem; min-height: 10rem; }
+.foot p { margin: 0; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <a class="wordmark" href="https://github.com/RoboDevelopX/breakwise" target="_blank" rel="noopener noreferrer"><b>break</b>wise</a>
+    <span class="tagline">Which dependency updates touch your code, what breaks, and the fix.</span>
+  </header>
+
+  <form id="scan-form" class="panel" hidden novalidate>
+    <div class="field">
+      <label for="path">Project folder</label>
+      <div class="row">
+        <input id="path" name="path" type="text" spellcheck="false" autocomplete="off" autocapitalize="off">
+        <button id="run" class="primary" type="submit">Check dependencies</button>
+      </div>
+      <p class="hint">A folder with requirements.txt, pyproject.toml or package.json. Relative paths start from <code id="started-in"></code>.</p>
+      <div id="demos" class="demos" hidden><span>Try an example:</span></div>
+    </div>
+    <details id="paste">
+      <summary>Paste a dependency list instead</summary>
+      <textarea id="manifest" rows="7" spellcheck="false" aria-label="Dependency list" placeholder="flask==3.0.0&#10;requests==2.31.0&#10;urllib3==1.26.18"></textarea>
+      <p class="hint">Paste requirements.txt, pyproject.toml or package.json. Breakwise still checks the code in the folder above for places that use these packages.</p>
+    </details>
+    <label class="check" for="ai"><input id="ai" type="checkbox"> Explain with Claude <span id="ai-hint" class="hint"></span></label>
+  </form>
+
+  <div id="progress" class="progress" role="status" hidden><span class="spinner" aria-hidden="true"></span><span id="progress-text"></span><span id="elapsed" class="mono"></span></div>
+  <p id="error" class="error" role="alert" hidden></p>
+
+  <section id="empty" class="empty" hidden>
+    <h2>Your report will appear here</h2>
+    <p>Breakwise reads the release notes between the versions you use and the latest ones, finds the lines in your code that use what changed, and tells you what breaks and how to fix it.</p>
+    <p>The first check of a project downloads release notes, so it takes a little while. Later checks use a cache.</p>
+  </section>
+
+  <main id="results" aria-live="polite"></main>
+</div>
+
+<script type="application/json" id="bw-config">__BREAKWISE_CONFIG__</script>
+<script type="application/json" id="bw-data">__BREAKWISE_DATA__</script>
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const readJSON = (id) => { try { return JSON.parse($(id).textContent); } catch (e) { return null; } };
+  const config = readJSON("bw-config") || { mode: "report" };
+  const data = readJSON("bw-data");
+
+  function el(tag, attrs, ...kids) {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === "class") n.className = v;
+      else n.setAttribute(k, v === true ? "" : String(v));
+    }
+    for (const kid of kids.flat(Infinity)) if (kid != null && kid !== false && kid !== "") n.append(kid);
+    return n;
+  }
+
+  // Text with `code spans` shown as code. Everything goes in as text, never as HTML.
+  function rich(text) {
+    const frag = document.createDocumentFragment();
+    for (const part of String(text || "").split(/(`[^`\n]+`)/)) {
+      if (part.length > 2 && part[0] === "`" && part[part.length - 1] === "`") frag.append(el("code", null, part.slice(1, -1)));
+      else if (part) frag.append(part);
+    }
+    return frag;
+  }
+
+  const plural = (n, word, many) => `${n} ${n === 1 ? word : (many || word + "s")}`;
+  const KIND_TONE = { breaking: "breaking", security: "security", deprecation: "warning", other: "warning", fix: "unknown", feature: "unknown" };
+
+  function renderImpact(i) {
+    return el("div", { class: "impact" + (i.counts ? "" : " possible") },
+      el("p", { class: "impact-head" },
+        el("span", { class: "kind", "data-tone": KIND_TONE[i.kind] || "unknown" }, i.label),
+        el("span", null, "in ", el("span", { class: "mono" }, i.version)),
+        i.symbol && el("code", null, i.symbol.replace(/^@/, "")),
+        !i.counts && el("span", null, "possible match"),
+        i.ai && el("span", null, "explained by Claude")),
+      el("p", { class: "explain" }, rich(i.explanation)),
+      i.sites.length > 0 && el("div", { class: "sites" },
+        i.sites.map((s) => el("div", { class: "site" }, el("span", { class: "loc" }, `${s.file}:${s.line}`), el("span", null, s.code)))),
+      i.more_sites > 0 && el("p", { class: "more" }, `…and ${plural(i.more_sites, "more place")}`),
+      i.fix && el("div", { class: "fix" }, el("span", { class: "fix-label" }, "Fix"), el("div", { class: "fix-text" }, rich(i.fix))));
+  }
+
+  function renderSecurity(p) {
+    const s = p.security;
+    return el("div", { class: "impact" },
+      el("p", { class: "impact-head" },
+        el("span", { class: "kind", "data-tone": "security" }, "Security"),
+        el("span", null, `${plural(s.total, "fix", "fixes")} in `, el("span", { class: "mono" }, s.span)),
+        !p.imported && el("span", null, "(your code doesn't import this package directly)")),
+      s.top.length > 0 && el("ul", { class: "entries" }, s.top.map((e) => el("li", null, el("span", { class: "ver" }, e.version), rich(e.text)))),
+      s.total > s.top.length && el("p", { class: "more" }, `…and ${s.total - s.top.length} more in the release notes`));
+  }
+
+  function renderPackage(p, v) {
+    const counted = p.impacts.filter((i) => i.counts);
+    const possible = p.impacts.filter((i) => !i.counts);
+    const n = p.other_breaking_total;
+    const body = [
+      counted.map(renderImpact),
+      p.security.total > 0 && renderSecurity(p),
+      p.runtime.map((r) => el("p", { class: "runtime" }, el("span", { class: "label" }, "Runtime"), r)),
+      possible.length > 0 && el("details", { class: "sub" },
+        el("summary", null, `${plural(possible.length, "possible match", "possible matches")} with lower confidence`),
+        possible.map(renderImpact)),
+      n > 0 && el("details", { class: "sub", open: !v.code_checked },
+        el("summary", null, v.code_checked ? `${plural(n, "other breaking change")} in these releases didn't match your code` : `${plural(n, "breaking change")} in these releases`),
+        el("ul", { class: "entries" }, p.other_breaking.map((e) => el("li", null, el("span", { class: "ver" }, e.version), rich(e.text)))),
+        n > p.other_breaking.length && el("p", { class: "more" }, `…and ${n - p.other_breaking.length} more in the release notes`)),
+      p.note && el("p", { class: "note" }, el("span", { class: "label" }, "Note"), p.note),
+      p.changelog_url && el("p", { class: "links" }, el("a", { href: p.changelog_url, target: "_blank", rel: "noopener noreferrer" }, "Read the release notes")),
+    ].flat().filter(Boolean);
+
+    const versions = p.has_update
+      ? el("span", { class: "pkg-ver" }, p.current, " → ", el("span", { class: "to" }, p.target))
+      : el("span", { class: "pkg-ver" }, p.current || "version unknown");
+    const meta = [
+      p.has_update && p.releases > 1 && plural(p.releases, "release"),
+      p.manifest,
+      p.ecosystem === "npm" ? "npm" : "PyPI",
+    ].filter(Boolean).join(" · ");
+    const head = [
+      el("span", { class: "dot", "aria-hidden": "true" }),
+      el("span", { class: "pkg-title" }, el("span", { class: "pkg-name" }, p.name), versions),
+      el("span", { class: "pill" }, p.status),
+      el("span", { class: "chev", "aria-hidden": "true", hidden: body.length === 0 }),
+      el("span", { class: "pkg-meta" }, meta),
+    ];
+    if (body.length === 0) return el("article", { class: "pkg", "data-tone": p.tone }, el("div", { class: "pkg-head" }, head));
+    const open = ["breaking", "security", "warning"].includes(p.tone) || (!v.code_checked && n > 0);
+    return el("article", { class: "pkg", "data-tone": p.tone },
+      el("details", { open }, el("summary", { class: "pkg-head" }, head), el("div", { class: "pkg-body" }, body)));
+  }
+
+  function renderFooter(v) {
+    const status = el("span", { role: "status" });
+    const box = el("textarea", { readonly: true, "aria-label": "Report as Markdown", hidden: true });
+    box.value = v.markdown;
+    const copy = el("button", { type: "button", class: "ghost" }, "Copy as Markdown");
+    copy.addEventListener("click", () => {
+      const fallback = () => { box.hidden = false; box.focus(); box.select(); status.textContent = "Select the text below and copy it."; };
+      try {
+        navigator.clipboard.writeText(v.markdown).then(
+          () => { status.textContent = "Copied. Paste it into a pull request or an issue."; },
+          fallback);
+      } catch (e) { fallback(); }
+    });
+    return el("footer", { class: "foot" },
+      el("div", { class: "foot-row" }, copy, status),
+      box,
+      el("p", null, [
+        v.ai ? "Explanations by Claude" : "Static analysis, no AI",
+        `generated ${v.generated}`,
+        `Breakwise ${v.version}`,
+      ].join(" · ")),
+      config.mode === "report" && el("p", null, "Run ", el("code", null, "breakwise serve"), " to check your own project in the browser."));
+  }
+
+  function renderReport(v) {
+    const root = $("results");
+    const c = v.counts;
+    const listed = v.packages.filter((p) => p.tone !== "current");
+    const current = v.packages.filter((p) => p.tone === "current");
+    root.replaceChildren(...[
+      el("section", { class: "summary" },
+        el("p", { class: "eyebrow" }, v.mode === "pr" ? "Dependency changes on this branch, " : "Dependency report for ", el("code", null, v.label)),
+        el("h1", { class: "headline" }, v.headline),
+        el("ul", { class: "counts" },
+          el("li", null, el("b", null, c.checked), " checked"),
+          el("li", null, el("b", null, c.updated), " with updates"),
+          el("li", { "data-tone": c.matters ? "warning" : null }, el("b", null, c.matters), c.matters === 1 ? " matters" : " matter"),
+          el("li", { "data-tone": c.breaking ? "breaking" : null }, el("b", null, c.breaking), c.breaking === 1 ? " breaks your code" : " break your code")),
+        v.no_code_note && el("p", { class: "notice" }, v.no_code_note)),
+      listed.length > 0 && el("section", { class: "pkgs", "aria-label": "Packages with updates" }, listed.map((p) => renderPackage(p, v))),
+      current.length > 0 && el("p", { class: "uptodate" }, el("span", { class: "label" }, "Up to date"),
+        current.map((p) => el("span", { class: "mono" }, `${p.name} ${p.current || ""}`.trim()))),
+      renderFooter(v),
+    ].filter(Boolean));
+    root.classList.remove("stale");
+  }
+
+  // ---------------------------------------------------------------- local app (breakwise serve)
+
+  function startApp() {
+    const form = $("scan-form"), path = $("path"), paste = $("paste"), manifest = $("manifest"), ai = $("ai");
+    const progress = $("progress"), error = $("error"), results = $("results"), empty = $("empty");
+    form.hidden = false;
+    empty.hidden = false;
+    $("started-in").textContent = config.startedIn || ".";
+    let remembered = null;
+    try { remembered = localStorage.getItem("breakwise.path"); } catch (e) { /* storage blocked */ }
+    path.value = remembered || config.defaultPath || ".";
+    if (!config.aiAvailable) {
+      ai.disabled = true;
+      $("ai-hint").textContent = "Set ANTHROPIC_API_KEY before you start breakwise serve to turn this on.";
+    }
+    const demos = $("demos");
+    for (const d of config.demos || []) {
+      const b = el("button", { type: "button", class: "chip" }, d);
+      b.addEventListener("click", () => { path.value = d; paste.open = false; run(); });
+      demos.append(b);
+    }
+    demos.hidden = !(config.demos || []).length;
+
+    let busy = false;
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const setBusy = (on) => {
+      busy = on;
+      $("run").disabled = on;
+      for (const b of demos.querySelectorAll("button")) b.disabled = on;
+      progress.hidden = !on;
+      if (on) { $("progress-text").textContent = "Starting"; $("elapsed").textContent = ""; }
+      results.classList.toggle("stale", on && results.childElementCount > 0);
+    };
+
+    async function poll(id) {
+      for (;;) {
+        await sleep(600);
+        const res = await fetch(`/api/jobs/${encodeURIComponent(id)}`);
+        const s = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(s.error || "The check stopped. Try again.");
+        $("progress-text").textContent = s.progress || "Working";
+        $("elapsed").textContent = `${Math.round(s.elapsed || 0)}s`;
+        if (s.state === "done") return s.result;
+        if (s.state === "error") throw new Error(s.error);
+      }
+    }
+
+    async function run() {
+      if (busy) return;
+      error.hidden = true;
+      setBusy(true);
+      try {
+        try { localStorage.setItem("breakwise.path", path.value); } catch (e) { /* storage blocked */ }
+        const res = await fetch("/api/scan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path: path.value, manifest: paste.open ? manifest.value : "", ai: ai.checked }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.error || `Breakwise answered with an error (${res.status}).`);
+        const result = await poll(body.job);
+        empty.hidden = true;
+        renderReport(result);
+      } catch (e) {
+        error.textContent = e instanceof TypeError
+          ? "Can't reach Breakwise. Check that breakwise serve is still running in your terminal, then try again."
+          : e.message;
+        error.hidden = false;
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    form.addEventListener("submit", (e) => { e.preventDefault(); run(); });
+  }
+
+  if (config.mode === "app") startApp();
+  if (data) renderReport(data);
+})();
+</script>
